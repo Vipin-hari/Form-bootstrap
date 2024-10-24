@@ -11,12 +11,12 @@ interface InputsProps {
     inputRows: InputRow[];
     handleInputChange: (index: number, field: 'name' | 'value', value: string) => void;
     addInputRow: () => void;
-    removeInputRow: (index: number) => void; // Added prop for removing an input row
+    removeInputRow: (index: number) => void;
     submitData: () => void;
-    clearData: () => void; // Added prop for clearing data
+    clearData: () => void;
 }
 
-function Inputs({ inputRows, handleInputChange, addInputRow, removeInputRow, submitData, clearData }: InputsProps) {
+const Inputs: React.FC<InputsProps> = ({ inputRows, handleInputChange, addInputRow, removeInputRow, submitData, clearData }) => {
     const inputContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -26,60 +26,63 @@ function Inputs({ inputRows, handleInputChange, addInputRow, removeInputRow, sub
     }, [inputRows]);
 
     return (
-        <Card className="p-3 md:p-10 h-fit md:w-[800px] mt-10 w-full">
-            <h1 className="text-2xl font-bold mb-4">Analytics Line Chart</h1>
+        <Card className="p-3 mb-4" style={{marginTop:"20px"}}>
+            <h1 className="h3 mb-2">Analytics Line Chart</h1>
 
-            {/* Dynamic Form Inputs */}
-            <div className="mb-6 gap-4 w-full">
-                <div ref={inputContainerRef} className='overflow-auto h-60 gap -4'>
+            <div className="mb-4">
+                <div ref={inputContainerRef} className='overflow-hidden' style={{ maxHeight: '240px' }}>
                     {inputRows.map((row, index) => (
-                        <div key={index} className="flex p-2 flex-col md:flex-row gap-4 items-center">
-                            <TextField
-                                type="text"
-                                value={row.name}
-                                onChange={(e) => handleInputChange(index, 'name', e.target.value)}
-                                placeholder="Enter Name"
-                                variant='outlined'
-                                label='name'
-                                className='w-full'
-                            />
-                            <TextField
-                                type="number"
-                                value={row.value}
-                                onChange={(e) => handleInputChange(index, 'value', e.target.value)}
-                                placeholder="Enter Value"
-                                variant='outlined'
-                                label='value'
-                                className='w-full'
-                            />
-                            <IconButton onClick={() => removeInputRow(index)}>
-                                <Tooltip title='Remove'>
-                                    <Trash className='text-red-500' />
-                                </Tooltip>
-                            </IconButton>
+                        <div key={index} className="row mb-3 align-items-center">
+                            <div className="col-md-5 mb-2 mb-md-0">
+                                <TextField
+                                    type="text"
+                                    value={row.name}
+                                    onChange={(e) => handleInputChange(index, 'name', e.target.value)}
+                                    placeholder="Enter Name"
+                                    variant='outlined'
+                                    label='Name'
+                                    fullWidth
+                                />
+                            </div>
+                            <div className="col-md-5 mb-2 mb-md-0">
+                                <TextField
+                                    type="number"
+                                    value={row.value}
+                                    onChange={(e) => handleInputChange(index, 'value', e.target.value)}
+                                    placeholder="Enter Value"
+                                    variant='outlined'
+                                    label='Value'
+                                    fullWidth
+                                />
+                            </div>
+                            <div className="col-md-2 text-center">
+                                <IconButton onClick={() => removeInputRow(index)} aria-label="Remove">
+                                    <Tooltip title='Remove'>
+                                        <Trash className='text-danger' />
+                                    </Tooltip>
+                                </IconButton>
+                            </div>
                         </div>
                     ))}
                 </div>
-                <div className='w-full flex justify-center'>
-                    <Button onClick={addInputRow} className='w-fit' variant='outlined'>
+
+                <div className='text-center mt-1'>
+                    <Button onClick={addInputRow} variant='contained' color='primary'>
                         Add Input Row
                     </Button>
                 </div>
             </div>
 
-            {/* Submit Data Button */}
-            <Button onClick={submitData} variant='contained'>
-                Save Data
-            </Button>
-
-            {/* Clear Data Button */}
-            <Button onClick={clearData} variant='outlined' color='error' className='mt-4' sx={{
-                marginLeft: 2
-            }}>
-                Clear Chart
-            </Button>
+            <div className="d-flex justify-content-center">
+                <Button onClick={submitData} variant='contained' color='primary'>
+                    Save Data
+                </Button>
+                <Button onClick={clearData} variant='outlined' color='error' className='ms-3'>
+                    Clear Chart
+                </Button>
+            </div>
         </Card>
     );
-}
+};
 
 export default Inputs;

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 import * as React from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
-import { PieChart } from '@mui/x-charts/PieChart'; // Import PieChart
+import { PieChart } from '@mui/x-charts/PieChart'; 
 import { Card, Select, MenuItem, FormControl } from '@mui/material';
 import Inputs from '../Input/Inputs';
 import toast from 'react-hot-toast';
@@ -9,10 +9,9 @@ import toast from 'react-hot-toast';
 export default function LineChartPage() {
     const [inputRows, setInputRows] = React.useState<{ name: string; value: string }[]>([{ name: '', value: '' }]);
     const [data, setData] = React.useState<{ id: number; value: number; label: string }[]>([]);
-    const [chartType, setChartType] = React.useState<'line' | 'pie'>('line'); // State for chart type
+    const [chartType, setChartType] = React.useState<'line' | 'pie'>('line'); 
 
     React.useEffect(() => {
-        // Load data from localStorage only on the client side
         const savedRows = localStorage.getItem('inputRows');
         if (savedRows) {
             setInputRows(JSON.parse(savedRows));
@@ -24,12 +23,10 @@ export default function LineChartPage() {
         }
     }, []);
 
-    // Handler to add a new input row
     const addInputRow = () => {
         setInputRows(prevRows => [...prevRows, { name: '', value: '' }]);
     };
 
-    // Handler to update an input row's value
     const handleInputChange = (index: number, field: 'name' | 'value', value: string) => {
         setInputRows(prevRows => {
             const updatedRows = [...prevRows];
@@ -40,13 +37,12 @@ export default function LineChartPage() {
                     value: parseFloat(row.value),
                     label: row.name,
                 }))
-                .filter(row => row.label && !isNaN(row.value)); // Filter out invalid rows
-            setData(newData); // Update to setData with newData instead of updatedRows
+                .filter(row => row.label && !isNaN(row.value)); 
+            setData(newData);
             return updatedRows;
         });
     };
 
-    // Handler to remove an input row
     const removeInputRow = (index: number) => {
         setInputRows(prevRows => {
             const updatedRows = prevRows.filter((_, i) => i !== index);
@@ -57,9 +53,9 @@ export default function LineChartPage() {
                     label: row.name,
                 }))
                 .filter(row => row.label && !isNaN(row.value));
-            setData(newData); // Update data state
-            localStorage.setItem('chartData', JSON.stringify(newData)); // Update local storage
-            localStorage.setItem('inputRows', JSON.stringify(updatedRows)); // Update local storage
+            setData(newData);
+            localStorage.setItem('chartData', JSON.stringify(newData));
+            localStorage.setItem('inputRows', JSON.stringify(updatedRows));
             return updatedRows;
         });
     };
@@ -73,25 +69,28 @@ export default function LineChartPage() {
             }))
             .filter(row => row.label && !isNaN(row.value));
         setData(newData);
-        localStorage.setItem('chartData', JSON.stringify(newData)); // Save chart data to local storage
+        localStorage.setItem('chartData', JSON.stringify(newData));
         localStorage.setItem('inputRows', JSON.stringify(inputRows));
-        return toast.success('Data saved succesfully')
+        return toast.success('Data saved successfully');
     };
 
     const clearData = () => {
-        setInputRows([{ name: '', value: '' }]); // Reset input rows
-        setData([]); // Clear chart data
-        localStorage.removeItem('chartData'); // Clear local storage
-        localStorage.removeItem('inputRows'); // Clear local storage
+        setInputRows([{ name: '', value: '' }]);
+        setData([]);
+        localStorage.removeItem('chartData');
+        localStorage.removeItem('inputRows');
     };
 
-    const windowWidth = typeof window !== "undefined" ? window.innerWidth : 640; // Handle window width safely
+    const calculateChartWidth = () => {
+        const windowWidth = typeof window !== "undefined" ? window.innerWidth : 640;
+        return Math.min(windowWidth - 40, 750); 
+    };
 
     return (
-        <div className='p-5 md:p-9 flex flex-col justify-center items-center'>
-            <Card className='p-3 md:p-10 w-full max-w-[800px]'>
-                <h1 className='text-2xl font-bold text-black'>Analytics Chart</h1>
-                <FormControl fullWidth>
+        <div className="container py-5 d-flex flex-column align-items-center">
+            <Card className="p-3 w-100" style={{ maxWidth: '800px' }}>
+                <h1 className="text-center">Analytics Chart</h1>
+                <FormControl fullWidth className="mb-4">
                     <Select
                         labelId="chart-type-label"
                         value={chartType}
@@ -101,21 +100,24 @@ export default function LineChartPage() {
                         <MenuItem value="pie">Pie Chart</MenuItem>
                     </Select>
                 </FormControl>
-                {chartType === 'line' ? (
-                    <LineChart
-                        colors={['#1976D2']} // Primary color for chart line
-                        width={windowWidth > 640 ? 750 : windowWidth - 40} // Responsive width
-                        height={250}
-                        series={[{ data: data.map(d => d.value), label: 'User Input Data' }]} // Corrected series format
-                        xAxis={[{ scaleType: 'point', data: data.map(d => d.label) }]} // Use user input names for x-axis
-                    />
-                ) : (
-                    <PieChart
-                        series={[{ data: data }]} // Send data in the required format for PieChart
-                        width={windowWidth > 640 ? 750 : windowWidth - 40} // Responsive width
-                        height={250}
-                    />
-                )}
+
+                <div className="w-100 d-flex justify-content-center">
+                    {chartType === 'line' ? (
+                        <LineChart
+                            colors={['#1976D2']}
+                            width={calculateChartWidth()} 
+                            height={250}
+                            series={[{ data: data.map(d => d.value), label: 'User Input Data' }]}
+                            xAxis={[{ scaleType: 'point', data: data.map(d => d.label) }]}
+                        />
+                    ) : (
+                        <PieChart
+                            series={[{ data: data }]}
+                            width={calculateChartWidth()} 
+                            height={250}
+                        />
+                    )}
+                </div>
             </Card>
             <Inputs 
                 inputRows={inputRows} 
@@ -123,7 +125,7 @@ export default function LineChartPage() {
                 addInputRow={addInputRow} 
                 submitData={submitData} 
                 clearData={clearData} 
-                removeInputRow={removeInputRow} // Pass the remove function to Inputs
+                removeInputRow={removeInputRow}
             />
         </div>
     );
